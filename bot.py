@@ -6,6 +6,7 @@ import datetime
 import urllib2
 import json
 
+# please don't mess around with my keys, thanks.
 c_key = 'PFuRYoFCdRvVqG3UMHfnfEXvZ'
 c_secret = 'Hiv0VJCXuPbRNvhe7LhChIQJPJroBj5m4mPTwdp7cNaAwdYPBw'
 a_token = '4915565709-7sm13JTJadJziX6SmnNPwidk6g7apuuG5dgPSnC'
