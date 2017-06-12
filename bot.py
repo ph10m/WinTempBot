@@ -15,7 +15,7 @@ t = Twitter(auth=OAuth(a_token,a_secret,c_key,c_secret))
 def post(x):
 	t.statuses.update(status=x)
 	print 'Updated status:\n'+x
-#post("gpu temps here goes here plz test 1xD23")
+
 weather_url = 'http://openweathermap.org/data/2.5/weather?id=3133880&appid=b1b15e88fa797225412429c1c50c122a1'
 def fetch_weather():
 	w = urllib2.urlopen(weather_url)
