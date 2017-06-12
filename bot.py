@@ -18,6 +18,6 @@ temperature_infos = w.Sensor()
 for sensor in temperature_infos:
     if sensor.SensorType==u'Temperature':
         if 'package' in sensor.Name.lower():
-            print 'CPU temp is'+sensor.Value
+            print 'CPU temp is',sensor.Value
         elif 'gpu' in sensor.Name.lower():
-            print 'GPU temp is'+round(sensor.Value,2)
+            print 'GPU temp is',round(sensor.Value,2)
