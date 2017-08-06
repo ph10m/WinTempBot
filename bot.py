@@ -1,4 +1,5 @@
 import os
+import re
 from twitter import *
 import wmi
 import time
@@ -6,6 +7,8 @@ import datetime
 import urllib2
 import json
 from weather import HARSTAD
+
+time.sleep(5)  # wait for openhardwaremonitor to load.
 
 c_key = 'PFuRYoFCdRvVqG3UMHfnfEXvZ'
 c_secret = 'Hiv0VJCXuPbRNvhe7LhChIQJPJroBj5m4mPTwdp7cNaAwdYPBw'
@@ -16,18 +19,23 @@ t = Twitter(auth=OAuth(a_token, a_secret, c_key, c_secret))
 
 
 def post(x):
+    print 'submitting'
     t.statuses.update(status=x)
     print 'Updated status:\n' + x
 
 
-weather_url = HARSTAD
-
 
 def fetch_weather():
-    w = urllib2.urlopen(weather_url)
+    w = urllib2.urlopen(HARSTAD)
     data = w.read()
     w.close()
     return str(json.loads(data)['main']['temp']) + 'C'
+
+
+def get_gpu(identifier):
+    regex = r'\/(\d)\/'
+    groups = re.search(regex, identifier)
+    return groups.group(1)
 
 
 fetch_weather()
@@ -46,20 +54,16 @@ while True:
             if 'package' in sensor.Name.lower():
                 cpu_temp = int(sensor.Value)
             elif 'gpu' in sensor.Name.lower():
+                gpu_name = get_gpu(sensor.Identifier)
                 gpu_temp = int(sensor.Value)
-            elif 'motherboard' in sensor.Name.lower():
-                mobo_temp = int(sensor.Value)
+                gpu_stats[gpu_name] = gpu_temp
 
-    temp_string = 'CPU: ' + str(cpu_temp) + ' | GPU: ' + \
-        str(gpu_temp) + ' | MB: ' + str(mobo_temp)
+
+    gpu_temps = ' '.join([(str(int(k)+1)+'('+ str(v)+')') for k, v in sorted(gpu_stats.items())])
+    temp_string = 'CPU: ' + str(cpu_temp) + \
+                ' | GPUs: ' + str(gpu_temps)
     post_string = time_string + weather_string + temp_string
-    if cpu_temp > 20 and gpu_temp > 20 and mobo_temp > 20:
-        # everything is ok
-        #  post(post_string)
-        print 'posting'
-    if cpu_temp > 50 or gpu_temp > 60 or mobo_temp > 45:
-        print 'hi stuff'
-        # critical
-        #  post('High temperatures detected, check the computer!')
+    print post_string
+    post(post_string)
     # sleep for 30 minutes
-    time.sleep(1800)
+    time.sleep(3600)
