@@ -21,10 +21,12 @@ def fetch_weather():
 	w = urllib2.urlopen(weather_url)
 	data = w.read()
 	w.close()
+	print 'successfully fetched weather!'
 	return str(json.loads(data)['main']['temp'])+'C'
 
 fetch_weather()
 w = wmi.WMI(namespace="root\OpenHardwareMonitor")
+print 'found openhardwaremonitor!'
 cpu_temp, gpu_temp, mobo_temp = -1,-1,-1
 while True:
 	temps = w.Sensor()
@@ -32,7 +34,7 @@ while True:
 	_time = time.strftime("%H:%M")
 	time_string = _date+' '+_time
 	weather_string = ' ('+fetch_weather()+' outside)\n'
-
+	voltage_string = 'Voltages: '
 	for sensor in temps:
 		if sensor.SensorType==u'Temperature':
 			if 'package' in sensor.Name.lower():
@@ -41,14 +43,18 @@ while True:
 				gpu_temp = int(sensor.Value)
 			elif 'motherboard' in sensor.Name.lower():
 				mobo_temp = int(sensor.Value)
-
-	temp_string = 'CPU: '+str(cpu_temp)+' | GPU: '+str(gpu_temp) +' | MB: '+str(mobo_temp)
-	post_string = time_string + weather_string + temp_string
-	if cpu_temp>20 and gpu_temp>20 and mobo_temp>20:
-		# everything is ok
-		post(post_string)
-	if cpu_temp>50 or gpu_temp>60 or mobo_temp>45:
+		elif sensor.SensorType==u'Voltage':
+			if len(sensor.Name)<7:
+				voltage_string += str(round(sensor.Value,3)) + ' '
+	print 'sensor data gathered!'
+	# temp_string = 'CPU: '+str(cpu_temp)+' | GPU: '+str(gpu_temp) +' | MB: '+str(mobo_temp) + '\n'
+	temp_string = 'CPU: '+str(cpu_temp)+' | GPU: '+str(gpu_temp) + '\n'
+	post_string = time_string + weather_string + temp_string + voltage_string
+	if cpu_temp>50 or gpu_temp>65 or mobo_temp>45:
 		# critical
-		post('High temperatures detected, check the computer!')
-	# sleep for 30 minutes
-	time.sleep(1800)
+		timenow = time.strftime('%H:%M:%S')
+		post(timenow + '- High temperatures, check the computer!')
+	else:
+		post(post_string)
+# sleep for 30 minutes
+	time.sleep(3600)
