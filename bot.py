@@ -8,7 +8,7 @@ import urllib2
 import json
 from weather import HARSTAD
 
-time.sleep(5)  # wait for openhardwaremonitor to load.
+time.sleep(15)  # wait for openhardwaremonitor to load.
 
 c_key = 'PFuRYoFCdRvVqG3UMHfnfEXvZ'
 c_secret = 'Hiv0VJCXuPbRNvhe7LhChIQJPJroBj5m4mPTwdp7cNaAwdYPBw'
